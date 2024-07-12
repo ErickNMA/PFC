@@ -175,30 +175,31 @@ class ED7255():
     
     #Função para plot dos dados:
     def plotData(self):
-        #Plot das trajetórias em espaço de juntas:
-        for i in range(5):
-            plt.figure()
-            plt.plot(self.data[0], self.data[i+1])
-            plt.xlabel('Tempo [ms]')
-            plt.ylabel(f'Junta {i+1} [$^\circ$]')
-            plt.show()
-        #Plot das trajetórias no plano cartesiano:
-        labels = ['x [mm]', 'y [mm]', 'z [mm]', 'a [$^\circ$]', 'e [$^\circ$]', 'r [$^\circ$]']
-        for i in range(3):
-            plt.figure()
-            plt.plot(self.data[0], self.data[i+6])
-            plt.xlabel('Tempo [ms]')
-            plt.ylabel(labels[i])
-            plt.show()            
-        for i in range(3,6):
-            plt.figure()
-            plt.plot(self.data[0], self.data[i+6])
-            plt.xlabel('Tempo [ms]')
-            plt.ylabel(labels[i])
-            plt.show()
-        #Reseta o vetor de dados e desliga a amostragem:
-        self.data = [[], [], [], [], [], [], [], [], [], [], [], []]
-        self.sampling = False
+        if(len(self.data[0])):
+            #Plot das trajetórias em espaço de juntas:
+            for i in range(5):
+                plt.figure()
+                plt.plot(self.data[0], self.data[i+1])
+                plt.xlabel('Tempo [ms]')
+                plt.ylabel(f'Junta {i+1} [$^\circ$]')
+                plt.show()
+            #Plot das trajetórias no plano cartesiano:
+            labels = ['x [mm]', 'y [mm]', 'z [mm]', 'a [$^\circ$]', 'e [$^\circ$]', 'r [$^\circ$]']
+            for i in range(3):
+                plt.figure()
+                plt.plot(self.data[0], self.data[i+6])
+                plt.xlabel('Tempo [ms]')
+                plt.ylabel(labels[i])
+                plt.show()            
+            for i in range(3,6):
+                plt.figure()
+                plt.plot(self.data[0], self.data[i+6])
+                plt.xlabel('Tempo [ms]')
+                plt.ylabel(labels[i])
+                plt.show()
+            #Reseta o vetor de dados e desliga a amostragem:
+            self.data = [[], [], [], [], [], [], [], [], [], [], [], []]
+            self.sampling = False
     
     #Função para movimentação livre em espaço de juntas:
     def moveJoint(self, target):
@@ -297,3 +298,34 @@ class ED7255():
             #Atualiza a configuração do robô:
             for i in range(5):
                 self.q[i] = jnt[i]
+    
+    #Função para jog incremental a partir da base:
+    def baseJog(self, delta):
+        x = self.forwardKinematics(self.q)
+        curpose = [x[0], x[1], x[2], x[4], x[5]]
+        self.moveLinear(np.array(curpose)+np.array(delta))
+
+    #Função para jog incremental a partir da ferramenta:
+    def toolJog(self, delta):
+        x = self.forwardKinematics(self.q)
+        curpose = [x[0], x[1], x[2], x[4], x[5]]
+        #Transformação do toolframe para o baseframe:
+        a = x[3]
+        e = x[4]
+        r = x[5]
+        r11 = ((np.cos(np.radians(a))*np.cos(np.radians(e))*np.cos(np.radians(r)))-(np.sin(np.radians(a))*np.sin(np.radians(r))))
+        r12 = (-(np.cos(np.radians(a))*np.cos(np.radians(e))*np.sin(np.radians(r)))-(np.sin(np.radians(a))*np.cos(np.radians(r))))
+        r13 = (np.cos(np.radians(a))*np.sin(np.radians(e)))
+        r21 = ((np.sin(np.radians(a))*np.cos(np.radians(e))*np.cos(np.radians(r)))+(np.cos(np.radians(a))*np.sin(np.radians(r))))
+        r22 = (-(np.sin(np.radians(a))*np.cos(np.radians(e))*np.sin(np.radians(r)))+(np.cos(np.radians(a))*np.cos(np.radians(r))))
+        r23 = (np.sin(np.radians(a))*np.sin(np.radians(e)))
+        r31 = (-np.sin(np.radians(e))*np.cos(np.radians(r)))
+        r32 = (np.sin(np.radians(e))*np.sin(np.radians(r)))
+        r33 = np.cos(np.radians(e))
+        R = np.array([
+            [r11, r12, r13],
+            [r21, r22, r23],
+            [r31, r32, r33]
+        ])
+        steps = R@np.array(delta[:3])
+        self.moveLinear(np.array(curpose)+np.concatenate([steps, np.array(delta[3:5])]))

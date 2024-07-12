@@ -17,6 +17,12 @@ robo.move([584.5, 0, 187, 90, 0])
 
 #Movimento linear:
 robo.moveLinear([500, 0, 187, 90, 0])
+robo.moveLinear([460, 0, 187, 90, 0])
+
+#Movimento incremental via base-jog:
+robo.baseJog([0, 0, 13, -30, 0])
+
+robo.toolJog([0, 0, -200, 0, 0])
 
 #Plotando as curvas:
 robo.plotData()
