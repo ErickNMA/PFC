@@ -1,10 +1,20 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class ED7255():
     #Inicializando o objeto:
     def __init__(self):
-        self.q = [0, 0, 0, 0, 0]
+        self.q = [0, 0, 0, 0, 0]                                        #configuração inicial das juntas do robô
+        self.tsmin = 30                                                 #menor tempo de acomodação do controlador
+        self.wmax = 90                                                  #velocidade angular máxima (grau/s)
+        self.vmax = 100                                                 #velocidade linear máxima (mm/s)
+        self.SPD_ANG = 80                                               #velocidade angular percentual
+        self.SPD_LIN = 100                                              #velocidade linear percentual
+        self.SPD = 50                                                   #Speed Override (velocidade geral percentual)
+        self.sampling = False                                           #Booleana para controle de amostragem
+        self.data = [[], [], [], [], [], [], [], [], [], [], [], []]    #Array para armazenar os dados de plot
 
+    #Função para cálculo da cinemática direta:
     def forwardKinematics(self, angles):
         x = (-np.cos(np.radians(angles[0]))*((230*np.sin(np.radians(angles[1])))+(230*np.sin(np.radians(angles[1]+angles[2])))+(124.5*np.sin(np.radians(angles[1]+angles[2]+angles[3])))))
         y = (-np.sin(np.radians(angles[0]))*((230*np.sin(np.radians(angles[1])))+(230*np.sin(np.radians(angles[1]+angles[2])))+(124.5*np.sin(np.radians(angles[1]+angles[2]+angles[3])))))
@@ -27,6 +37,7 @@ class ED7255():
             
         return np.array([round(x,3), round(y,3), round(z,3), round(a,3), round(e,3), round(r,3)])
 
+    #Função para cálculo da cinemática inversa:
     def inverseKinematics(self, pose):
         #Elementos da matriz de rotação:
         e = pose[3]
@@ -130,5 +141,109 @@ class ED7255():
 
         return output
     
+    #Função para retorno da pose atual do robô:
     def getPose(self):
         return self.forwardKinematics(self.q)
+    
+    #Função para iniciar a amostragem:
+    def initSampling(self):
+        self.sampling = True
+    
+    #Função para plot dos dados:
+    def plotData(self):
+        #Plot das trajetórias em espaço de juntas:
+        for i in range(5):
+            plt.figure()
+            plt.plot(self.data[0], self.data[i+1])
+            plt.xlabel('Tempo [ms]')
+            plt.ylabel(f'Junta {i+1} [$^\circ$]')
+            plt.show()
+        #Plot das trajetórias no plano cartesiano:
+        labels = ['x [mm]', 'y [mm]', 'z [mm]', 'a [$^\circ$]', 'e [$^\circ$]', 'r [$^\circ$]']
+        for i in range(3):
+            plt.figure()
+            plt.plot(self.data[0], self.data[i+6])
+            plt.xlabel('Tempo [ms]')
+            plt.ylabel(labels[i])
+            plt.show()            
+        for i in range(3,6):
+            plt.figure()
+            plt.plot(self.data[0], self.data[i+6])
+            plt.xlabel('Tempo [ms]')
+            plt.ylabel(labels[i])
+            plt.show()
+        #Reseta o vetor de dados e desliga a amostragem:
+        self.data = [[], [], [], [], [], [], [], [], [], [], [], []]
+        self.sampling = False
+    
+    #Função para movimentação livre em espaço de juntas:
+    def moveJoint(self, target):
+        #Conferindo os limites angulares do robô:
+        lims = [[-170, 170], [-90, 30], [-135, 0], [-110, 90], [-160, 160]]
+        valid = True
+        for i in range(5):
+            valid = (valid and (target[i]>=lims[i][0]) and (target[i]<=lims[i][1]))
+        if(valid):
+            #Obter o maior diferencial de deslocamento:
+            dtheta = np.max(np.abs(np.array(target)-np.array(self.q)))
+            #Tempo total de movimentação, em ms:
+            dt = int((dtheta/(self.SPD*1e-2*self.SPD_ANG*1e-2*self.wmax))*1e3)
+            #Vetor de amostras no tempo:
+            kf = dt
+            n = int(dt/self.tsmin)
+            k = np.linspace(0, kf, n)
+            #Cálculo dos coeficientes das trajetórias:
+            q0 = np.array(self.q)
+            qf = np.array(target)
+            a = np.empty((5,3,1))
+            A = np.array([
+                [(kf**3), (kf**4), (kf**5)],
+                [(3*(kf**2)), (4*(kf**3)), (5*(kf**4))],
+                [(6*kf), (12*(kf**2)), (20*(kf**3))]
+            ])
+            invA = np.linalg.inv(A)
+            for i in range(5):
+                C = np.matrix([
+                    [qf[i]-q0[i]],
+                    [0],
+                    [0]
+                ])
+                a[i] = invA@C
+            #Aplicação da trajetória em si:
+            traj = []
+            for i in range(5):
+                traj.append(np.array(q0[i] + (a[i][0][0]*(k**3)) + (a[i][1][0]*(k**4)) + (a[i][2][0]*(k**5))))
+            #Atualiza a configuração do robô:
+            for i in range(5):
+                self.q[i] = traj[i][-1]
+            if(self.sampling):
+                #Armazenamento das trajetórias em espaço de juntas:
+                if(len(self.data[0])):
+                    lastk = self.data[0][-1]
+                else:
+                    lastk = 0
+                for i in range(n):
+                    self.data[0].append(lastk+k[i])
+                for j in range(5):
+                    for i in range(n):
+                        self.data[j+1].append(traj[j][i])
+                #Armzenamento das trajetórias no plano cartesiano:
+                cart = []
+                for i in range(n):
+                    cart.append(self.forwardKinematics([traj[0][i], traj[1][i], traj[2][i], traj[3][i], traj[4][i]]))
+                cart = np.array(cart)
+                for j in range(6):
+                    for i in range(n):
+                        self.data[j+6].append(cart[:,j][i])
+        else:
+            print('\n! Configuração fora dos limites angulares das juntas !')
+        
+
+    #Função para movimentação livre em coordenadas cartesianas:
+    def move(self, target):
+        jointspace = self.inverseKinematics(target)[0]
+        if(len(jointspace)):
+            self.moveJoint(jointspace)
+
+    # #Função para movimentação linear:
+    # def moveLinear(self, target):
