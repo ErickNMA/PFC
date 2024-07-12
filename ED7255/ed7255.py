@@ -7,9 +7,9 @@ def forwardKinematics(angles):
     se = (-np.sin(np.radians(angles[1]+angles[2]+angles[3])))
     ce = np.cos(np.radians(angles[1]+angles[2]+angles[3]))
     e = np.degrees(np.arctan2(se,ce))
-    if(np.sin(np.radians(e))>=1e-6):
+    if(abs(np.sin(np.radians(e)))>=1e-6):
         a = angles[0]
-        sr = (np.sin(np.radians(angles[4]))*np.sin(np.radians(angles[1]+angles[2]+angles[3]))/np.sin(np.radians(e)))
+        sr = (-np.sin(np.radians(angles[4]))*np.sin(np.radians(angles[1]+angles[2]+angles[3]))/np.sin(np.radians(e)))
         cr = (-np.cos(np.radians(angles[4]))*np.sin(np.radians(angles[1]+angles[2]+angles[3]))/np.sin(np.radians(e)))
         r = np.degrees(np.arctan2(sr,cr))
     else:
@@ -26,7 +26,7 @@ def inverseKinematics(pose):
     #Elementos da matriz de rotação:
     e = pose[3]
     r = pose[4]
-    if(np.sin(np.radians(e))>=1e-6):
+    if(abs(np.sin(np.radians(e)))>=1e-6):
         a = np.degrees(np.arctan2(pose[1], pose[0]))
     else:
         a = 0
@@ -37,7 +37,7 @@ def inverseKinematics(pose):
     r22 = (-(np.sin(np.radians(a))*np.cos(np.radians(e))*np.sin(np.radians(r)))+(np.cos(np.radians(a))*np.cos(np.radians(r))))
     r23 = (np.sin(np.radians(a))*np.sin(np.radians(e)))
     r31 = (-np.sin(np.radians(e))*np.cos(np.radians(r)))
-    r32 = (-np.sin(np.radians(e))*np.sin(np.radians(r)))
+    r32 = (np.sin(np.radians(e))*np.sin(np.radians(r)))
     r33 = np.cos(np.radians(e))
 
     #Desacoplamento cinemático:
@@ -65,7 +65,10 @@ def inverseKinematics(pose):
     r = np.sqrt((xc**2)+(yc**2))
     h = np.sqrt((r**2)+((zc-187)**2))
     c3 = (((h**2)/(2*(230**2)))-1)
-    s3 = np.sqrt(1-(c3**2))
+    if(abs(c3)>1):
+        print('! A pose não pertence ao espaço de trabalho do robô !')
+        return np.array([])
+    s3 = np.sqrt(1-(c3**2))    
     #Front Elbow Up:
     sol[0][2] = np.degrees(np.arctan2(-s3, c3))
     #Front Elbow Down:
@@ -94,16 +97,30 @@ def inverseKinematics(pose):
 
     #Theta 5:
     for i in range(len(sol)):
-        if(a >= 1e-3):
+        if(abs(a) >= 1e-3):
             s5 = (-(r11*np.sin(np.radians(sol[i][0])))+(r21*np.cos(np.radians(sol[i][0]))))
             c5 = (-(r12*np.sin(np.radians(sol[i][0])))+(r22*np.cos(np.radians(sol[i][0]))))
             sol[i][4] = np.degrees(np.arctan2(s5, c5))
         else:
             sol[i][4] = ((pose[4]-sol[i][0])/np.cos(np.radians(sol[i][1]+sol[i][2]+sol[i][3])))
-            #print(sol[i][4])
             if(sol[i][4]>180):
                 sol[i][4] = (180-sol[i][4])
             if(sol[i][4]< -180):
                 sol[i][4] = (sol[i][4]+180)
+    
+    #Conferindo os limites angulares do robô:
+    lims = [[-170, 170], [-90, 30], [-135, 0], [-110, 90], [-160, 160]]
+    output = []
+    for s in sol:
+        valid = True
+        for j in range(len(lims)):
+            valid = (valid and (s[j]>=lims[j][0]) and ((s[j]<=lims[j][1])))
+        if(valid):
+            output.append(s.round(4))
+        else:
+            output.append([])
+    
+    if(not(len(output[0])+len(output[1])+len(output[2])+len(output[3]))):
+        print('! A pose não pertence ao espaço de trabalho do robô !')
 
-    return sol.round(4)
+    return output
