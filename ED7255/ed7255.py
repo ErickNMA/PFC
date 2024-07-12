@@ -1,6 +1,30 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+#Função para cálculo das constantes para a função de trajetória:
+def getConsts(arr_y0, arr_yf, final_time):
+    q0 = np.array(arr_y0)
+    qf = np.array(arr_yf)
+    a = np.empty((5,3,1))
+    A = np.array([
+        [(final_time**3), (final_time**4), (final_time**5)],
+        [(3*(final_time**2)), (4*(final_time**3)), (5*(final_time**4))],
+        [(6*final_time), (12*(final_time**2)), (20*(final_time**3))]
+    ])
+    invA = np.linalg.inv(A)
+    for i in range(5):
+        C = np.matrix([
+            [qf[i]-q0[i]],
+            [0],
+            [0]
+        ])
+        a[i] = invA@C
+    return a
+
+#Função para aplicação da função de trajetória:
+def f(x, y0, consts):
+    return np.array(y0 + (consts[0][0]*(x**3)) + (consts[1][0]*(x**4)) + (consts[2][0]*(x**5)))
+
 class ED7255():
     #Inicializando o objeto:
     def __init__(self):
@@ -83,7 +107,7 @@ class ED7255():
         c3 = (((h**2)/(2*(230**2)))-1)
         if(abs(c3)>1):
             print('! A pose não pertence ao espaço de trabalho do robô !')
-            return np.array([])
+            return np.array([[], [], [], []])
         s3 = np.sqrt(1-(c3**2))    
         #Front Elbow Up:
         sol[0][2] = np.degrees(np.arctan2(-s3, c3))
@@ -193,26 +217,11 @@ class ED7255():
             n = int(dt/self.tsmin)
             k = np.linspace(0, kf, n)
             #Cálculo dos coeficientes das trajetórias:
-            q0 = np.array(self.q)
-            qf = np.array(target)
-            a = np.empty((5,3,1))
-            A = np.array([
-                [(kf**3), (kf**4), (kf**5)],
-                [(3*(kf**2)), (4*(kf**3)), (5*(kf**4))],
-                [(6*kf), (12*(kf**2)), (20*(kf**3))]
-            ])
-            invA = np.linalg.inv(A)
-            for i in range(5):
-                C = np.matrix([
-                    [qf[i]-q0[i]],
-                    [0],
-                    [0]
-                ])
-                a[i] = invA@C
+            a = getConsts(self.q, target, kf)
             #Aplicação da trajetória em si:
             traj = []
             for i in range(5):
-                traj.append(np.array(q0[i] + (a[i][0][0]*(k**3)) + (a[i][1][0]*(k**4)) + (a[i][2][0]*(k**5))))
+                traj.append(f(k, self.q[i], a[i]))
             #Atualiza a configuração do robô:
             for i in range(5):
                 self.q[i] = traj[i][-1]
@@ -245,5 +254,46 @@ class ED7255():
         if(len(jointspace)):
             self.moveJoint(jointspace)
 
-    # #Função para movimentação linear:
-    # def moveLinear(self, target):
+    #Função para movimentação linear:
+    def moveLinear(self, target):
+        jointspace = self.inverseKinematics(target)[0]
+        x = self.forwardKinematics(self.q)
+        curpose = [x[0], x[1], x[2], x[4], x[5]]
+        if(len(jointspace)):
+            #Obter o maior diferencial de deslocamento:
+            dd = np.sqrt(((target[0]-curpose[0])**2) + ((target[1]-curpose[1])**2) + ((target[2]-curpose[2])**2))
+            #Tempo total de movimentação, em ms:
+            dt = int((dd/(self.SPD*1e-2*self.SPD_LIN*1e-2*self.vmax))*1e3)
+            #Vetor de amostras no tempo:
+            kf = dt
+            n = int(dt/self.tsmin)
+            k = np.linspace(0, kf, n)
+            #Cálculo dos coeficientes angulares:
+            steps = np.empty(5)
+            for i in range(5):
+                steps[i] = ((target[i] - curpose[i])/dt)
+            #Formulação das trajetórias:
+            if(self.sampling):
+                if(len(self.data[0])):
+                    lastk = self.data[0][-1]
+                else:
+                    lastk = 0
+            for i in range(n):
+                jnt = self.inverseKinematics([(curpose[0]+(k[i]*steps[0])), (curpose[1]+(k[i]*steps[1])), (curpose[2]+(k[i]*steps[2])), (curpose[3]+(k[i]*steps[3])), (curpose[4]+(k[i]*steps[4]))])[0]
+                cart = self.forwardKinematics(jnt)
+                if(self.sampling):
+                    self.data[0].append(lastk+k[i])
+                    self.data[1].append(jnt[0])
+                    self.data[2].append(jnt[1])
+                    self.data[3].append(jnt[2])
+                    self.data[4].append(jnt[3])
+                    self.data[5].append(jnt[4])
+                    self.data[6].append(cart[0])
+                    self.data[7].append(cart[1])
+                    self.data[8].append(cart[2])
+                    self.data[9].append(cart[3])
+                    self.data[10].append(cart[4])
+                    self.data[11].append(cart[5])
+            #Atualiza a configuração do robô:
+            for i in range(5):
+                self.q[i] = jnt[i]
