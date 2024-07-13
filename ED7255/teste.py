@@ -22,7 +22,15 @@ robo.moveLinear([460, 0, 187, 90, 0])
 #Movimento incremental via base-jog:
 robo.baseJog([0, 0, 13, -30, 0])
 
-robo.toolJog([0, 0, -200, 0, 0])
+#Movimento incremental via tool-jog:
+robo.move([0, 500, 200, 90, 0])
+robo.toolJog([0, 100, -100, 0, 0])
+
+# #Demonstração do movelinear suavizado:
+# robo.move([400, 400, 187, 90, 0])
+# robo.initSampling()
+# #robo.move([0, 500, 187, 90, 0])
+# robo.moveLinear([400, -400, 187, 90, 0])
 
 #Plotando as curvas:
 robo.plotData()

@@ -3,37 +3,37 @@ import matplotlib.pyplot as plt
 
 #Função para cálculo das constantes para a função de trajetória:
 def getConsts(arr_y0, arr_yf, final_time):
-    q0 = np.array(arr_y0)
-    qf = np.array(arr_yf)
-    a = np.empty((5,3,1))
+    q0 = np.array(arr_y0, dtype=np.float64)
+    qf = np.array(arr_yf, dtype=np.float64)
+    a = np.empty((len(arr_y0),3,1))
     A = np.array([
         [(final_time**3), (final_time**4), (final_time**5)],
         [(3*(final_time**2)), (4*(final_time**3)), (5*(final_time**4))],
         [(6*final_time), (12*(final_time**2)), (20*(final_time**3))]
-    ])
+    ], dtype=np.float64)
     invA = np.linalg.inv(A)
-    for i in range(5):
+    for i in range(len(arr_y0)):
         C = np.matrix([
             [qf[i]-q0[i]],
             [0],
             [0]
-        ])
+        ], dtype=np.float64)
         a[i] = invA@C
     return a
 
 #Função para aplicação da função de trajetória:
 def f(x, y0, consts):
-    return np.array(y0 + (consts[0][0]*(x**3)) + (consts[1][0]*(x**4)) + (consts[2][0]*(x**5)))
+    return (y0 + (consts[0][0]*(x**3)) + (consts[1][0]*(x**4)) + (consts[2][0]*(x**5)))
 
 class ED7255():
     #Inicializando o objeto:
     def __init__(self):
         self.q = [0, 0, 0, 0, 0]                                        #configuração inicial das juntas do robô
         self.tsmin = 30                                                 #menor tempo de acomodação do controlador
-        self.wmax = 90                                                  #velocidade angular máxima (grau/s)
+        self.wmax = 60                                                  #velocidade angular máxima (grau/s)
         self.vmax = 100                                                 #velocidade linear máxima (mm/s)
         self.SPD_ANG = 80                                               #velocidade angular percentual
-        self.SPD_LIN = 100                                              #velocidade linear percentual
+        self.SPD_LIN = 200                                              #velocidade linear percentual
         self.SPD = 50                                                   #Speed Override (velocidade geral percentual)
         self.sampling = False                                           #Booleana para controle de amostragem
         self.data = [[], [], [], [], [], [], [], [], [], [], [], []]    #Array para armazenar os dados de plot
@@ -183,6 +183,12 @@ class ED7255():
                 plt.xlabel('Tempo [ms]')
                 plt.ylabel(f'Junta {i+1} [$^\circ$]')
                 plt.show()
+            #Plot do plano XY:
+            plt.figure()
+            plt.plot(self.data[6], self.data[7])
+            plt.xlabel('x [mm]')
+            plt.ylabel('y [mm]')
+            plt.show()
             #Plot das trajetórias no plano cartesiano:
             labels = ['x [mm]', 'y [mm]', 'z [mm]', 'a [$^\circ$]', 'e [$^\circ$]', 'r [$^\circ$]']
             for i in range(3):
@@ -279,8 +285,12 @@ class ED7255():
                     lastk = self.data[0][-1]
                 else:
                     lastk = 0
+            #Suavização da trajetória alterando o tempo:
+            a = getConsts([0], [kf], n)[0]
             for i in range(n):
-                jnt = self.inverseKinematics([(curpose[0]+(k[i]*steps[0])), (curpose[1]+(k[i]*steps[1])), (curpose[2]+(k[i]*steps[2])), (curpose[3]+(k[i]*steps[3])), (curpose[4]+(k[i]*steps[4]))])[0]
+                jnt = self.inverseKinematics([(curpose[0]+(f(i, 0, a)*steps[0])), (curpose[1]+(f(i, 0, a)*steps[1])), (curpose[2]+(f(i, 0, a)*steps[2])), (curpose[3]+(f(i, 0, a)*steps[3])), (curpose[4]+(f(i, 0, a)*steps[4]))])[0]
+                if(not len(jnt)):
+                    break
                 cart = self.forwardKinematics(jnt)
                 if(self.sampling):
                     self.data[0].append(lastk+k[i])
@@ -296,8 +306,9 @@ class ED7255():
                     self.data[10].append(cart[4])
                     self.data[11].append(cart[5])
             #Atualiza a configuração do robô:
-            for i in range(5):
-                self.q[i] = jnt[i]
+            if(len(jnt)):
+                for i in range(5):
+                    self.q[i] = jnt[i]
     
     #Função para jog incremental a partir da base:
     def baseJog(self, delta):
