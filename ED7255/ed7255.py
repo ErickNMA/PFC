@@ -119,15 +119,13 @@ class ED7255():
         sol[3][2] = np.degrees(np.arctan2(-s3, c3))
 
         #Theta 2:
-        beta = np.degrees(np.arctan2((zc-187), r))
+        alpha = np.degrees(np.arctan2((zc-187), r))
         for i in range(len(sol)):
+            gamma = np.degrees(np.arctan2(np.abs(-230*np.sin(np.radians(sol[i][2]))), (230*(1+np.cos(np.radians(sol[i][2]))))))
             if(i<2):
-                alpha = np.degrees(np.arctan2((-230*np.sin(np.radians(sol[i][2]))), (230*(1+np.cos(np.radians(sol[i][2]))))))
-                sol[i][1] = (alpha+beta-90)
+                sol[i][1] = (alpha+gamma-90)
             else:
-                alpha = np.degrees(np.arctan2((230*np.sin(np.radians(sol[i][2]))), (230*(1+np.cos(np.radians(sol[i][2]))))))
-                sol[i][1] = (90-alpha-beta)
-            
+                sol[i][1] = (90-alpha+gamma)            
 
         #Theta 4:
         for i in range(len(sol)):
