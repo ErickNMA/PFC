@@ -15,7 +15,7 @@ robo.moveJoint([-20, -30, -80, -15, 45])
 robo.move([300, 300, 200, 90, 0])
 robo.move([584.5, 0, 187, 90, 0])
 
-#Movimento linear:
+# #Movimento linear:
 robo.moveLinear([500, 0, 187, 90, 0])
 robo.moveLinear([460, 0, 187, 90, 0])
 
