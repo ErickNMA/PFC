@@ -1,0 +1,16 @@
+Robótica: spong, siciliano
+
+Controle Clássico: ogata, nise, dorf
+
+Eletrônica: boylestad, malvino, sedra, 
+
+Potência/Máquinas: ahmed, chapman, mohan, fitzgerald, 
+
+Modelagem e Projeto: astrom, garcia, modelagem
+
+Instrumentação: aguirre, 
+
+Esp: esp32ds, esp32trm
+
+IoT: erick
+
