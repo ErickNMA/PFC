@@ -205,6 +205,10 @@ class ED7255():
             self.data = [[], [], [], [], [], [], [], [], [], [], [], []]
             self.sampling = False
     
+    #Função para retornar os dados das curvas:
+    def getData(self):
+        return self.data
+    
     #Função para movimentação livre em espaço de juntas:
     def moveJoint(self, target):
         #Conferindo os limites angulares do robô:
