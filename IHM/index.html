@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ED-7255</title>
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.2/mqttws31.min.js" type="text/javascript"></script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div class="top-bar">
+            <div class="status-bar">
+                <div class="status-message" id="status-message">Waiting connection...</div>
+            </div>
+            <div class="top-buttons">
+                <div style="display: flex; width: 90px; background-color: #414141; align-items: center; justify-content: space-around;">
+                    <div style="width: 30px; font-size: 13px; color: white;">
+                        SPD OVR
+                    </div>                
+                    <input type="number" class="numinput" min="1" max="100" step="1" value="50" id="spdovr">
+                </div>
+                <button title="START" class="start-btn" content-id="start">
+                    <img src="src/images/play-button.png" class="icon">
+                </button>
+                <button title="HOLD" class="hold-btn" content-id="hold">
+                    <img src="src/images/hold-button.png" class="icon">
+                </button>
+                <button title="REC" class="rec-btn" content-id="rec">
+                    <img src="src/images/rec-button.png" class="icon">
+                </button>
+                <button title="STOP" class="stop-btn" content-id="stop">
+                    <img src="src/images/stop-button.png" class="icon">
+                </button>
+            </div>
+        </div>
+        
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" content-id="home">
+                Home
+            </button>
+            <button class="tab-btn" content-id="modeling">
+                Modeling
+            </button>
+            <button class="tab-btn" content-id="motion">
+                Motion
+            </button>
+            <button class="tab-btn" content-id="program">
+                Program
+            </button>
+            <button class="tab-btn" content-id="graph">
+                Graph
+            </button>
+        </div>
+
+        <div class="tab-contents">
+            <div class="content show" id="home">
+                <div style="width: 100vw; height: 60px; display: flex; align-items: center; justify-content: space-around;">
+                    <button class="gen-btn" id="bothome">
+                        <img src="src/images/home-buttonpng.png" class="icon" title="Go to HOME">
+                    </button>
+                </div>
+                <div class="show-jnt">
+                    <div id="j1h">J1: 0.0 °</div>
+                    <div id="j2h">J2: 0.0 °</div>
+                    <div id="j3h">J3: 0.0 °</div>
+                    <div id="j4h">J4: 0.0 °</div>
+                    <div id="j5h">J5: 0.0 °</div>
+                    <div id="griph">Grip: 40 mm</div>
+                </div>
+                <div class="show-cart">
+                    <div id="Xh">X: 0 mm</div>
+                    <div id="Yh">Y: 0 mm</div>
+                    <div id="Zh">Z: 0 mm</div>
+                    <div id="ah">a: 0.0 °</div>
+                    <div id="eh">e: 0.0 °</div>
+                    <div id="rh">r: 0.0 °</div>
+                </div>
+                <div style="display: flex; width: 100vw; height: 70vh; align-items: center; justify-content: space-around;">
+                    <table border="2" style="align-items: center; justify-content: center; text-align: center;">
+                        <caption style="font-weight: bold;">Default Controller</caption>
+                        <tr>
+                            <th class="table-cell">DOF</th>
+                            <th class="table-cell">Constant</th>
+                            <th class="table-cell">Value</th>
+                        </tr>
+                        <tr>
+                            <td class="table-cell" rowspan="3">J1</td>
+                            <td class="table-cell">Kp</td>
+                            <td class="table-cell">0.8</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Ki</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Kd</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell" rowspan="3">J2</td>
+                            <td class="table-cell">Kp</td>
+                            <td class="table-cell">0.8</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Ki</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Kd</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell" rowspan="3">J3</td>
+                            <td class="table-cell">Kp</td>
+                            <td class="table-cell">1.0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Ki</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Kd</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell" rowspan="3">J4</td>
+                            <td class="table-cell">Kp</td>
+                            <td class="table-cell">1.0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Ki</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Kd</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell" rowspan="3">J5</td>
+                            <td class="table-cell">Kp</td>
+                            <td class="table-cell">1.0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Ki</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Kd</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell" rowspan="3">Grip</td>
+                            <td class="table-cell">Kp</td>
+                            <td class="table-cell">1.0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Ki</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Kd</td>
+                            <td class="table-cell">0</td>
+                        </tr>
+                    </table>
+                    <img src="src/images/logo.png" class="logo-img" alt="Logo CEFET-MG">
+                    <table border="2" style="align-items: center; justify-content: center; text-align: center;">
+                        <caption style="font-weight: bold;">Targets</caption>
+                        <tr>
+                            <th class="table-cell">DOF</th>
+                            <th class="table-cell">Setpoint</th>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">J1</td>
+                            <td class="table-cell">-90 °</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">J2</td>
+                            <td class="table-cell">-30 °</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">J3</td>
+                            <td class="table-cell">-60 °</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">J4</td>
+                            <td class="table-cell">90 °</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">J5</td>
+                            <td class="table-cell">0 °</td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell">Grip</td>
+                            <td class="table-cell">50 mm</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="content" id="modeling">
+                <div style="display: flex; width: 100vw; height: 50px; align-items: center; justify-content: space-around;">
+                    <select class="inputboxes" id="loop-type" title="Loop Type"  style="width: 90px;">
+                        <option value = "O">Open Loop</option>
+                        <option value = "C">PID</option>
+                    </select>
+                    <select class="inputboxes" id="joint-select" title="Joint" style="width: 70px;">
+                        <option value = "J1">Joint 1</option>
+                        <option value = "J2">Joint 2</option>
+                        <option value = "J3">Joint 3</option>
+                        <option value = "J4">Joint 4</option>
+                        <option value = "J5">Joint 5</option>
+                        <option value = "J6">Grip</option>
+                    </select>
+                </div>
+                <div class="show-jnt">
+                    <div id="j1">J1: 0.0 °</div>
+                    <div id="j2">J2: 0.0 °</div>
+                    <div id="j3">J3: 0.0 °</div>
+                    <div id="j4">J4: 0.0 °</div>
+                    <div id="j5">J5: 0.0 °</div>
+                    <div id="grip">Grip: 40 mm</div>
+                </div>
+                <div style="display: flex; width: 100vw; height: 75vh; align-items: center; justify-content: center;">
+                    <img src="src/images/robo.png" class="robo-img" alt="ED-7255">
+                    <div style="display: grid; width: 300px; height: 300px; align-items: center; justify-content: space-around;">
+                        <div id="constantes" style="display: none;">
+                            <span class="labels" id="constlabel" style="width: 300px; height: 70px;">Current controller: Kp = - Ki = - Kd = - </span> <br>
+                            <input class="inputboxes" style=" width: 50px; padding: 8px;" type="number" id="kpin" placeholder="Kp" step="0.001" min="-50" max="50">
+                            <input class="inputboxes" style=" width: 50px; padding: 8px;" type="number" id="kiin" placeholder="Ki" step="0.001" min="-50" max="50">
+                            <input class="inputboxes" style=" width: 50px; padding: 8px;" type="number" id="kdin" placeholder="Kd" step="0.001" min="-50" max="50">
+                            <input class="custom-button" type="submit" id="botup" value="Update">
+                        </div>
+                        <div id="reference" style="display:block">
+                            <span class="labels" id="reflabel">PWM: - %</span> <br>
+                            <input class="inputboxes" style="width: 50px;" type="number" id="refval" placeholder="PWM" step="1" min="-180" max="180">
+                            <input class="custom-button" type="submit" id="sendref" value="Send">
+                        </div>
+                    </div>
+                </div>                
+            </div>
+            <div class="content" id="motion">
+                <div style="display: flex; width: 100vw; height: 50px; align-items: center; justify-content: space-around;">
+                    <select class="inputboxes" id="coord-type" title="Coord/Move Type" style="width: 70px;">
+                        <option value = "J">Joint</option>
+                        <option value = "B">Base</option>
+                        <option value = "T">Tool</option>
+                        <option value = "G">Target</option>
+                    </select>
+                </div>
+                <div class="motion-joint">
+                    <div class="show-jnt">
+                        <div id="j1m">J1: 0.0 °</div>
+                        <div id="j2m">J2: 0.0 °</div>
+                        <div id="j3m">J3: 0.0 °</div>
+                        <div id="j4m">J4: 0.0 °</div>
+                        <div id="j5m">J5: 0.0 °</div>
+                        <div id="gripm">Grip: 40 mm</div>
+                    </div>
+                    <div style="display: flex; width: 100vw; height: 75vh; align-items: center; justify-content: space-around;">
+                        <img src="src/images/robo.png" class="robo-img" alt="ED-7255">
+                        <div style="display: grid; width: 500px; height: 60vh; justify-content: space-around;">
+                            <div style="width: 400px;">
+                                <span>J1:</span>
+                                <input type="range" id="j1jog" min="-170" max="170" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
+                                <output>0</output>
+                                <span>°</span>
+                            </div>
+                            <div style="width: 400px;">
+                                <span>J2:</span>
+                                <input type="range" id="j2jog" min="-90" max="30" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
+                                <output>0</output>
+                                <span>°</span>
+                            </div>
+                            <div style="width: 400px;">
+                                <span>J3:</span>
+                                <input type="range" id="j3jog" min="-135" max="0" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
+                                <output>0</output>
+                                <span>°</span>
+                            </div>
+                            <div style="width: 400px;">
+                                <span>J4:</span>
+                                <input type="range" id="j4jog" min="-90" max="90" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
+                                <output>0</output>
+                                <span>°</span>
+                            </div>
+                            <div style="width: 400px;">
+                                <span>J5:</span>
+                                <input type="range" id="j5jog" min="-170" max="170" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
+                                <output>0</output>
+                                <span>°</span>
+                            </div>
+                            <div style="width: 400px;">
+                                <span>Grip:</span>
+                                <input type="range" id="gripjog" min="0" max="80" step="1" value="40" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
+                                <output>40</output>
+                                <span>mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="motion-base">
+                    <div class="show-cart">
+                        <div id="Xb">X: 0 mm</div>
+                        <div id="Yb">Y: 0 mm</div>
+                        <div id="Zb">Z: 0 mm</div>
+                        <div id="ab">a: 0.0 °</div>
+                        <div id="eb">e: 0.0 °</div>
+                        <div id="rb">r: 0.0 °</div>
+                    </div>
+                    <div style="display: flex; width: 100vw; height: 75vh; align-items: center; justify-content: space-around;">
+                        <img src="src/images/robo.png" class="robo-img" alt="ED-7255">
+                        <div class="jog">
+                            <div class="xy-jog">
+                                <div></div>
+                                <button class="arrow-btn" title="+X">
+                                    <img src="src/images/arrow.png" class="arrow" style="rotate: -90deg">
+                                </button>                        
+                                <div></div>
+                                <button class="arrow-btn" title="+Y">
+                                    <img src="src/images/arrow.png" class="arrow" style="rotate: 180deg">
+                                </button>
+                                <div></div>
+                                <button class="arrow-btn" title="-Y">
+                                    <img src="src/images/arrow.png" class="arrow" style="rotate: 0deg">
+                                </button>
+                                <div></div>
+                                <button class="arrow-btn" title="-X">
+                                    <img src="src/images/arrow.png" class="arrow" style="rotate: 90deg">
+                                </button>
+                                <div></div>
+                            </div>
+                            <div class="z-jog">
+                                <button class="z-arrow-btn" title="+Z">
+                                    <img src="src/images/z-arrow.png" class="arrow" style="rotate: 180deg">
+                                </button>
+                                <button class="z-arrow-btn" title="-Z">
+                                    <img src="src/images/z-arrow.png" class="arrow" style="rotate: 0deg">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="motion-tool">
+                    <div class="show-cart">
+                        <div id="Xt">X: 0 mm</div>
+                        <div id="Yt">Y: 0 mm</div>
+                        <div id="Zt">Z: 0 mm</div>
+                        <div id="at">a: 0.0 °</div>
+                        <div id="et">e: 0.0 °</div>
+                        <div id="rt">r: 0.0 °</div>
+                    </div>
+                    <div style="display: flex; width: 100vw; height: 75vh; align-items: center; justify-content: space-around;">
+                        <img src="src/images/robo.png" class="robo-img" alt="ED-7255">
+                        <div class="jog">
+                            <div class="xy-jog">
+                                <div></div>
+                                <button class="arrow-btn" title="+X">
+                                    <img src="src/images/arrow.png" class="arrow" style="rotate: -90deg">
+                                </button>                        
+                                <div></div>
+                                <button class="arrow-btn" title="+Y">
+                                    <img src="src/images/arrow.png" class="arrow" style="rotate: 180deg">
+                                </button>
+                                <div></div>
+                                <button class="arrow-btn" title="-Y">
+                                    <img src="src/images/arrow.png" class="arrow" style="rotate: 0deg">
+                                </button>
+                                <div></div>
+                                <button class="arrow-btn" title="-X">
+                                    <img src="src/images/arrow.png" class="arrow" style="rotate: 90deg">
+                                </button>
+                                <div></div>
+                            </div>
+                            <div class="z-jog">
+                                <button class="z-arrow-btn" title="+Z">
+                                    <img src="src/images/z-arrow.png" class="arrow" style="rotate: 180deg">
+                                </button>
+                                <button class="z-arrow-btn" title="-Z">
+                                    <img src="src/images/z-arrow.png" class="arrow" style="rotate: 0deg">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="motion-target">
+                    <div class="show-jnt">
+                        <div id="j1g">J1: 0.0 °</div>
+                        <div id="j2g">J2: 0.0 °</div>
+                        <div id="j3g">J3: 0.0 °</div>
+                        <div id="j4g">J4: 0.0 °</div>
+                        <div id="j5g">J5: 0.0 °</div>
+                        <div id="gripg">Grip: 40 mm</div>
+                    </div>
+                    <div class="show-cart">
+                        <div id="Xg">X: 0 mm</div>
+                        <div id="Yg">Y: 0 mm</div>
+                        <div id="Zg">Z: 0 mm</div>
+                        <div id="ag">a: 0.0 °</div>
+                        <div id="eg">e: 0.0 °</div>
+                        <div id="rg">r: 0.0 °</div>
+                    </div>
+                    <div style="display: flex; width: 100vw; height: 60vh; align-items: center; justify-content: center;">
+                        <select class="inputboxes" id="move-type" title="Move Type" style="width: 140px;">
+                            <option value = "MJ">MOVE JOINT TO</option>
+                            <option value = "ML">MOVE LINEAR TO</option>
+                            <option value = "MA">MOVE ABOUT</option>
+                        </select>
+                        <div id="target-values" style="display: flex;">
+                            <input class="inputboxes" style=" width: 70px; padding: 8px;" type="number" id="tg1" placeholder="J1">
+                            <input class="inputboxes" style=" width: 70px; padding: 8px;" type="number" id="tg2" placeholder="J2">
+                            <input class="inputboxes" style=" width: 70px; padding: 8px;" type="number" id="tg3" placeholder="J3">
+                            <input class="inputboxes" style=" width: 70px; padding: 8px;" type="number" id="tg4" placeholder="J4">
+                            <input class="inputboxes" style=" width: 70px; padding: 8px;" type="number" id="tg5" placeholder="J5">
+                        </div>
+                        <select class="inputboxes" id="frame-choose" title="Reference Frame" style="width: 80px; display: none;">
+                            <option value = "IB">IN BASE</option>
+                            <option value = "IT">IN TOOL</option>
+                        </select>
+                        <input class="custom-button" type="submit" id="botgo" value="GO" style="height: 30px; align-items: center; padding: 0; padding-left: 8px; padding-right: 8px;">
+                    </div>
+                </div>
+            </div>
+            <div class="content" id="program">
+                <div class="tool-bar">
+                    <button class="gen-btn">
+                        <img src="src/images/new-button.png" class="icon" id="new-btn" title="New File">
+                    </button>
+                    <button class="gen-btn">
+                        <img src="src/images/open-button.png" class="icon" id="open-btn" title="Open File">
+                    </button>
+                    <input type="file" style="display: none;" id="file-input" accept=".ed">
+                    <button class="gen-btn">
+                        <img src="src/images/save-button.png" class="icon" id="save-btn" title="Save File">
+                    </button>
+                    <button class="gen-btn">
+                        <img src="src/images/mark-button.png" class="icon" title="Mark Pose">
+                    </button>
+                    <button class="gen-btn">
+                        <img src="src/images/build-button.png" class="icon" title="Build Program">
+                    </button>
+                </div>
+                <div class="prog">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <textarea class="text-editor" id="editor" rows="25"></textarea>
+                </div>
+            </div>
+            <div class="content" id="graph">
+                <div style="display: flex; width: 100vw; height: 50px; align-items: center; justify-content: space-around;">
+                    <select class="inputboxes" id="graph-type" title="View Layout"  style="width: 100px;">
+                        <option value = "A">Single DOF</option>
+                        <option value = "B">ALL DOF's</option>
+                        <option value = "C">ALL PWM's</option>
+                        <option value = "D">Error/PID</option>
+                        <option value = "E">Cartesian</option>
+                        <option value = "F">ALL Currents</option>
+                    </select>
+                    <select class="inputboxes" id="gdl-select" title="DOF" style="display: flex; width: 70px;">
+                        <option value = "J1">Joint 1</option>
+                        <option value = "J2">Joint 2</option>
+                        <option value = "J3">Joint 3</option>
+                        <option value = "J4">Joint 4</option>
+                        <option value = "J5">Joint 5</option>
+                        <option value = "J6">Grip</option>
+                    </select>
+                </div>
+                <div class="graphics" id="graphics">
+                    <div class="chart" id="rtc1" style="display: flex; width: 80vw;">
+                        <canvas id="real-time-chart1"></canvas>
+                    </div>
+                    <div class="chart" id="rtc2" style="display: flex; width: 80vw;">
+                        <canvas id="real-time-chart2"></canvas>
+                    </div>
+                    <div class="chart" id="rtc3" style="display: none;">
+                        <canvas id="real-time-chart3"></canvas>
+                    </div>
+                    <div class="chart" id="rtc4" style="display: none;">
+                        <canvas id="real-time-chart4"></canvas>
+                    </div>
+                    <div class="chart" id="rtc5" style="display: none;">
+                        <canvas id="real-time-chart5"></canvas>
+                    </div>
+                    <div class="chart" id="rtc6" style="display: none;">
+                        <canvas id="real-time-chart6"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/javascript/script.js"></script>
+</body>
+</html>

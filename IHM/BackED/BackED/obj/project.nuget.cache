@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "muwMbh6weFjtYYfM0LQGb+X4dVhNUBEsE1L+dCGXbcNwAnfVVBcXlSgunyVvUIH55i4KdEoxveevdSqYRZrqnA==",
+  "success": true,
+  "projectFilePath": "C:\\wED7255\\BackED\\BackED\\BackED.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\erick\\.nuget\\packages\\mqttnet\\4.3.1.873\\mqttnet.4.3.1.873.nupkg.sha512",
+    "C:\\Users\\erick\\.nuget\\packages\\mqttnet.aspnetcore\\4.3.1.873\\mqttnet.aspnetcore.4.3.1.873.nupkg.sha512",
+    "C:\\Users\\erick\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.16\\microsoft.netcore.app.ref.6.0.16.nupkg.sha512",
+    "C:\\Users\\erick\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.16\\microsoft.windowsdesktop.app.ref.6.0.16.nupkg.sha512",
+    "C:\\Users\\erick\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.16\\microsoft.aspnetcore.app.ref.6.0.16.nupkg.sha512",
+    "C:\\Users\\erick\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\6.0.16\\microsoft.netcore.app.host.win-x64.6.0.16.nupkg.sha512"
+  ],
+  "logs": []
+}

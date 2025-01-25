@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <WORKSPACE>
- <FRAME activewindow="2">
-  <PLACEMENT>2c00000002000000030000000083ffff0083ffffffffffffffffffff100000000d000000bf0300002c040000</PLACEMENT>
+ <FRAME activewindow="1">
+  <PLACEMENT>2c0000000200000003000000ffffffffffffffffffffffffffffffff100000000d000000bf0300002c040000</PLACEMENT>
   <WINDOW type="default" module="ISIS">
    <editor metric="0" gridmajor="2540000" mode="00000000" zoom="-1" scale="126" flipped="0" gridminor="254000" gridmode="32" snapidx="2" snap="254000" xcursor="0" orgmode="0" snaprange="127000">
     <world y1="-8890000" x1="-12700000" y2="8890000" x2="12700000"/>
@@ -10,25 +10,25 @@
    </editor>
   </WINDOW>
   <WINDOW type="default" module="ARES">
-   <editor metric="1" gridmajor="1000000" mode="00000000" zoom="-1" scale="539" flipped="0" gridminor="40000" gridmode="32" snapidx="0" snap="10000" xcursor="0" orgmode="0" snaprange="23562">
+   <editor metric="1" gridmajor="1000000" mode="00000000" zoom="-1" scale="441" flipped="0" gridminor="200000" gridmode="32" snapidx="0" snap="10000" xcursor="0" orgmode="0" snaprange="28798">
     <world y1="-12700000" x1="-15240000" y2="12700000" x2="15240000"/>
-    <centre x="-2670525" y="-3520000"/>
+    <centre x="-1790000" y="-5630000"/>
     <origin x="0" y="0"/>
    </editor>
   </WINDOW>
   <WINDOW type="VIEW3D" module="VIEW3D">
    <camera>
-    <position x="2217023" y="3879630" z="6227743"/>
-    <focus x="2204233" y="4650802" z="-1109546"/>
-    <up x="-14764" y="994411" z="104543"/>
+    <position x="185581" y="-14395418" z="14083629"/>
+    <focus x="185581" y="-311790" z="0"/>
+    <up x="0" y="707106" z="707106"/>
    </camera>
   </WINDOW>
   <WINDOW type="default" module="BOM"/>
  </FRAME>
  <MODULE name="ARES">
-  <editor metric="1" gridmajor="1000000" mode="00000000" zoom="-1" scale="539" flipped="0" gridminor="40000" gridmode="32" snapidx="0" snap="10000" xcursor="0" orgmode="0" snaprange="23562">
+  <editor metric="1" gridmajor="1000000" mode="00000000" zoom="-1" scale="441" flipped="0" gridminor="200000" gridmode="32" snapidx="0" snap="10000" xcursor="0" orgmode="0" snaprange="28798">
    <world y1="-12700000" x1="-15240000" y2="12700000" x2="15240000"/>
-   <centre x="-2670525" y="-3520000"/>
+   <centre x="-1790000" y="-5630000"/>
    <origin x="0" y="0"/>
   </editor>
  </MODULE>
