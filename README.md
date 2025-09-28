@@ -5,14 +5,12 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 [FINAL PAPER](https://drive.google.com/file/d/1IV7_ScXzZWTYZx_DazngR-hfs36UWTP1/view?usp=drive_link)
 
 ## Requirements
-
 * [Microsoft .NET SDK 6.0.428](https://dotnet.microsoft.com/pt-br/download/dotnet/6.0)
 * Notebook with WiFi Hotspot
 * [Python](https://www.python.org/) (optional - alternative programming)
 * [VS Code](https://code.visualstudio.com/) (optional - alternative programming)
 
 ## Setup
-
 1. Download the IHM complete folder
 2. Enable the WiFi Hotspot and set:
    - SSID: Erick
@@ -21,13 +19,11 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 4. Power on the robot and controller (certify that the emergency stop button is released)
 
 ## Working
-
 1. The joint values should be updated to the real current measures
 2. Press 'START' button to enable the joint control
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/fba98134-332e-4356-9cad-8c2ebb70ff8e" />
 
 ## Implemented features
-
 * _'Home'_ tab:
   - 'START'/'HOLD' button
   - 'SPD OVR' (partially implemented)
@@ -54,7 +50,6 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
   - 'Cartesian' mode
 
 ## Remarks
-
 * Dynamic modeling was not done.
 * The controller tunning is not the ideal one and must be improved in the future.
 * Non-linear control techniques will be required to handle with non-linearities such as deadbands, slashes and intrinsic manipulator model dynamics.
