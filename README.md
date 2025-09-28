@@ -58,7 +58,7 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 * Non-linear control techniques will be required to handle with non-linearities such as deadbands, slashes and intrinsic manipulator model dynamics.
 * Only proportional effect of the PID is being used for now.
 * Gravity affected joints may present steady state errors.
-* Since the wrist is a differential arange, it may present oscilations and steady state errors.
+* Since the wrist is built by a differential arrangement, it may present oscilations and steady state errors.
 * The grip is programmed to do to follow a specific opening target and not to grab any object automatically.
 
 **! THIS PROJECT IS A WORK IN PROGRESS AND MAY CONTAIN ERRORS AND UNFINISHED RESOURCES !**
