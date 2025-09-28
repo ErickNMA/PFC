@@ -64,5 +64,5 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 * The grip is programmed to follow a specific opening target and not to grab any object automatically.
 
 ---
-**⚠️ _THIS PROJECT IS A WORK IN PROGRESS AND MAY CONTAIN ERRORS AND UNFINISHED RESOURCES_ ⚠️**
+### **⚠️ _THIS PROJECT IS A WORK IN PROGRESS AND MAY CONTAIN ERRORS AND UNFINISHED RESOURCES_ ⚠️**
 ---
