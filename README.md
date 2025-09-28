@@ -17,7 +17,7 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 2. Enable the WiFi Hotspot and set:
    - SSID: Erick
    - Password: fanplate
-3. Execute the 'init.bat' file (automatically starts the server and HMI)
+3. Execute the _'init.bat'_ file (automatically starts the server and HMI)
 4. Power on the robot and controller (certify that the emergency stop button is released)
 
 ## Working
@@ -28,24 +28,24 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 
 ## Implemented features
 
-* 'Home' tab:
+* _'Home'_ tab:
   - 'START'/'HOLD' button
   - 'SPD OVR' (partially implemented)
   - 'REC'/'STOP' button
   - 'GO to HOME' button
   - Joint 'real time' values
   - Cartesian 'real time' values
-* 'Modeling' tab (THIS TAB MUST BE CAREFULLY USED - CAN DAMAGE THE SYSTEM - CONTROL PARAMETERS ARE DIRECTLY SET):
+* _'Modeling'_ tab (THIS TAB MUST BE CAREFULLY USED - CAN DAMAGE THE SYSTEM - CONTROL PARAMETERS ARE DIRECTLY SET):
   - 'Open Loop' mode
   - 'PID' mode
-* 'Motion' tab:
+* _'Motion'_ tab:
   - 'Joint' mode
   - 'Target' mode
-* 'Program' tab:
+* _'Program'_ tab:
   - 'New File' button
   - 'Open File' button
   - 'Save File' button
-* 'Graph' tab:
+* _'Graph'_ tab:
   - 'Single DOF' mode
   - 'ALL DOFs' mode
   - 'ALL PWMs' mode
