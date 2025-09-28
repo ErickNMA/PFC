@@ -35,7 +35,7 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
   - 'GO to HOME' button
   - Joint 'real time' values
   - Cartesian 'real time' values
-* _'Modeling'_ tab (THIS TAB MUST BE CAREFULLY USED - CAN DAMAGE THE SYSTEM - CONTROL PARAMETERS ARE DIRECTLY SET):
+* _'Modeling'_ tab <font color="blue">(THIS TAB MUST BE CAREFULLY USED - CAN DAMAGE THE SYSTEM - CONTROL PARAMETERS ARE DIRECTLY SET)</font>:
   - 'Open Loop' mode
   - 'PID' mode
 * _'Motion'_ tab:
@@ -61,4 +61,4 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 * Since the wrist is built by a differential arrangement, it may present oscilations and steady state errors.
 * The grip is programmed to follow a specific opening target and not to grab any object automatically.
 
-**⚠️ THIS PROJECT IS A WORK IN PROGRESS AND MAY CONTAIN ERRORS AND UNFINISHED RESOURCES ⚠️**
+**⚠️ _THIS PROJECT IS A WORK IN PROGRESS AND MAY CONTAIN ERRORS AND UNFINISHED RESOURCES_ ⚠️**
