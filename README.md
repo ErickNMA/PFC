@@ -24,7 +24,7 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 
 1. The joint values should be updated to the real current measures
 2. Press 'START' button to enable the joint controls
-<img width="3360" height="1080" alt="image" src="https://github.com/user-attachments/assets/afe17b3b-d026-43a1-bfdd-7603cbf1d774" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/fba98134-332e-4356-9cad-8c2ebb70ff8e" />
 
 ## Implemented features
 
