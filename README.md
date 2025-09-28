@@ -28,10 +28,37 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 
 ## Implemented features
 
-* HOME tab:
+* 'Home' tab:
   - 'START'/'HOLD' button
   - 'SPD OVR' (partially implemented)
   - 'REC'/'STOP' button
   - 'GO to HOME' button
   - Joint 'real time' values
   - Cartesian 'real time' values
+* 'Modeling' tab (THIS TAB MUST BE CAREFULLY USED - CAN DAMAGE THE SYSTEM - CONTROL PARAMETERS ARE DIRECTLY SET):
+  - 'Open Loop' mode
+  - 'PID' mode
+* 'Motion' tab:
+  - 'Joint' mode
+  - 'Target' mode
+* 'Program' tab:
+  - 'New File' button
+  - 'Open File' button
+  - 'Save File' button
+* 'Graph' tab:
+  - 'Single DOF' mode
+  - 'ALL DOFs' mode
+  - 'ALL PWMs' mode
+  - 'Cartesian' mode
+
+## Remarks
+
+* Dynamic modeling was not done.
+* The controller tunning is not the ideal one and must be improved in the future.
+* Non-linear techiniques will be required to handle with non-linearities such as deadbands, slashes and intrinsic manipulator model dynamics.
+* Only proportional effect of the PID is being used for now.
+* Gravity affected joints may present steady state errors.
+* Since the wrist is a differential arange, it may present oscilations and steady state errors.
+* The grip is programmed to do to follow a specific opening target and not to grab any object automatically.
+
+**! THIS PROJECT IS A WORK IN PROGRESS AND MAY CONTAIN ERRORS AND UNFINISHED RESOURCES !**
