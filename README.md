@@ -61,4 +61,4 @@ Development of a microcontroller based controller for a 5 DOF didatic manipulato
 * Since the wrist is built by a differential arrangement, it may present oscilations and steady state errors.
 * The grip is programmed to follow a specific opening target and not to grab any object automatically.
 
-**! THIS PROJECT IS A WORK IN PROGRESS AND MAY CONTAIN ERRORS AND UNFINISHED RESOURCES !**
+**⚠️ THIS PROJECT IS A WORK IN PROGRESS AND MAY CONTAIN ERRORS AND UNFINISHED RESOURCES ⚠️**
