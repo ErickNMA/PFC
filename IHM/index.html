@@ -47,7 +47,7 @@
             <button class="tab-btn" content-id="modeling">
                 Modeling
             </button>
-            <button class="tab-btn" content-id="motion">
+            <button class="tab-btn" content-id="motion" id="tab-motion">
                 Motion
             </button>
             <button class="tab-btn" content-id="program">
@@ -177,27 +177,27 @@
                         </tr>
                         <tr>
                             <td class="table-cell">J1</td>
-                            <td class="table-cell">-90 °</td>
+                            <td class="table-cell" id="spj1">-90 °</td>
                         </tr>
                         <tr>
                             <td class="table-cell">J2</td>
-                            <td class="table-cell">-30 °</td>
+                            <td class="table-cell" id="spj2">-30 °</td>
                         </tr>
                         <tr>
                             <td class="table-cell">J3</td>
-                            <td class="table-cell">-60 °</td>
+                            <td class="table-cell" id="spj3">-60 °</td>
                         </tr>
                         <tr>
                             <td class="table-cell">J4</td>
-                            <td class="table-cell">90 °</td>
+                            <td class="table-cell" id="spj4">90 °</td>
                         </tr>
                         <tr>
                             <td class="table-cell">J5</td>
-                            <td class="table-cell">0 °</td>
+                            <td class="table-cell" id="spj5">0 °</td>
                         </tr>
                         <tr>
                             <td class="table-cell">Grip</td>
-                            <td class="table-cell">50 mm</td>
+                            <td class="table-cell" id="spg">50 mm</td>
                         </tr>
                     </table>
                 </div>
@@ -267,37 +267,37 @@
                             <div style="width: 400px;">
                                 <span>J1:</span>
                                 <input type="range" id="j1jog" min="-170" max="170" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
-                                <output>0</output>
+                                <output id="rj1">0</output>
                                 <span>°</span>
                             </div>
                             <div style="width: 400px;">
                                 <span>J2:</span>
                                 <input type="range" id="j2jog" min="-90" max="30" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
-                                <output>0</output>
+                                <output id="rj2">0</output>
                                 <span>°</span>
                             </div>
                             <div style="width: 400px;">
                                 <span>J3:</span>
                                 <input type="range" id="j3jog" min="-135" max="0" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
-                                <output>0</output>
+                                <output id="rj3">0</output>
                                 <span>°</span>
                             </div>
                             <div style="width: 400px;">
                                 <span>J4:</span>
                                 <input type="range" id="j4jog" min="-90" max="90" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
-                                <output>0</output>
+                                <output id="rj4">0</output>
                                 <span>°</span>
                             </div>
                             <div style="width: 400px;">
                                 <span>J5:</span>
                                 <input type="range" id="j5jog" min="-170" max="170" step="1" value="0" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
-                                <output>0</output>
+                                <output id="rj5">0</output>
                                 <span>°</span>
                             </div>
                             <div style="width: 400px;">
                                 <span>Grip:</span>
                                 <input type="range" id="gripjog" min="0" max="80" step="1" value="40" style="width: 300px;" oninput="this.nextElementSibling.value = this.value">
-                                <output>40</output>
+                                <output id="rgg">40</output>
                                 <span>mm</span>
                             </div>
                         </div>
@@ -317,28 +317,28 @@
                         <div class="jog">
                             <div class="xy-jog">
                                 <div></div>
-                                <button class="arrow-btn" title="+X">
+                                <button class="arrow-btn" title="+X" id="x+b">
                                     <img src="src/images/arrow.png" class="arrow" style="rotate: -90deg">
                                 </button>                        
                                 <div></div>
-                                <button class="arrow-btn" title="+Y">
+                                <button class="arrow-btn" title="+Y" id="y+b">
                                     <img src="src/images/arrow.png" class="arrow" style="rotate: 180deg">
                                 </button>
                                 <div></div>
-                                <button class="arrow-btn" title="-Y">
+                                <button class="arrow-btn" title="-Y" id="y-b">
                                     <img src="src/images/arrow.png" class="arrow" style="rotate: 0deg">
                                 </button>
                                 <div></div>
-                                <button class="arrow-btn" title="-X">
+                                <button class="arrow-btn" title="-X" id="x-b">
                                     <img src="src/images/arrow.png" class="arrow" style="rotate: 90deg">
                                 </button>
                                 <div></div>
                             </div>
                             <div class="z-jog">
-                                <button class="z-arrow-btn" title="+Z">
+                                <button class="z-arrow-btn" title="+Z" id="z+b">
                                     <img src="src/images/z-arrow.png" class="arrow" style="rotate: 180deg">
                                 </button>
-                                <button class="z-arrow-btn" title="-Z">
+                                <button class="z-arrow-btn" title="-Z" id="z-b">
                                     <img src="src/images/z-arrow.png" class="arrow" style="rotate: 0deg">
                                 </button>
                             </div>
@@ -359,28 +359,28 @@
                         <div class="jog">
                             <div class="xy-jog">
                                 <div></div>
-                                <button class="arrow-btn" title="+X">
+                                <button class="arrow-btn" title="+X" id="x+t">
                                     <img src="src/images/arrow.png" class="arrow" style="rotate: -90deg">
                                 </button>                        
                                 <div></div>
-                                <button class="arrow-btn" title="+Y">
+                                <button class="arrow-btn" title="+Y"id="y+t">
                                     <img src="src/images/arrow.png" class="arrow" style="rotate: 180deg">
                                 </button>
                                 <div></div>
-                                <button class="arrow-btn" title="-Y">
+                                <button class="arrow-btn" title="-Y"id="y-t">
                                     <img src="src/images/arrow.png" class="arrow" style="rotate: 0deg">
                                 </button>
                                 <div></div>
-                                <button class="arrow-btn" title="-X">
+                                <button class="arrow-btn" title="-X"id="x-t">
                                     <img src="src/images/arrow.png" class="arrow" style="rotate: 90deg">
                                 </button>
                                 <div></div>
                             </div>
                             <div class="z-jog">
-                                <button class="z-arrow-btn" title="+Z">
+                                <button class="z-arrow-btn" title="+Z"id="z+t">
                                     <img src="src/images/z-arrow.png" class="arrow" style="rotate: 180deg">
                                 </button>
-                                <button class="z-arrow-btn" title="-Z">
+                                <button class="z-arrow-btn" title="-Z"id="z-t">
                                     <img src="src/images/z-arrow.png" class="arrow" style="rotate: 0deg">
                                 </button>
                             </div>

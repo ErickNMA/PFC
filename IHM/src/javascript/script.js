@@ -9,6 +9,8 @@ const ctx6 = document.getElementById('real-time-chart6').getContext('2d');
 //Definição de variáveis e constantes:
 const ts = 10*10e-3;
 var recording = false;
+var current_dofs = [0, 0, 0, 0, 0, 0, 50];
+var conected = false;
 
 //Inicializa MQTT:
 const options = {
@@ -35,6 +37,11 @@ function onConnectionLost(responseObject){
 //Função de mensagem recebida do MQTT:
 function onMessageArrived(message){
     //console.log(message.destinationName + ": " + message.payloadString);
+    if(!conected)
+    {
+        conected = true;
+        setStatus('Successfull controller conection!');
+    }
     if(message.destinationName == 'reply')
     {
         validCOM(message.payloadString);
@@ -70,6 +77,25 @@ function onConnect(){
 //Função para enviar mensagem no tópico do MQTT:
 function sendMqtt(topic, message) {
     client.send(topic, message);
+}
+
+//Função para ações no retorno da controlarora:
+function validCOM(payload) {
+    if(payload[0] == 'W')
+    {
+        tempStatus('! Move Limit Reached on DOF '+String(parseInt(payload[1])+1)+' !');
+        setStatus('Waiting command...');
+    }
+    if(payload == 'X')
+    {
+        tempStatus('! Target Pose is out of Workspace !');
+        setStatus('Waiting command...');
+    }
+    if(payload[1] == '1')
+    {
+        setStatus('* End of Moving *');
+        setStatus('Waiting command...');
+    }
 }
 
 //Conversão de unidades:
@@ -162,6 +188,10 @@ function sampHandler1(payload) {
             recordingData.dof[i].push(vals[i]);
         }
     }
+    for(let i=0; i<6; i++)
+    {
+        current_dofs[i] = parseFloat(vals[i]);
+    }
     let cart = forwardKinematics([parseFloat(vals[0]), parseFloat(vals[1]), parseFloat(vals[2]), parseFloat(vals[3]), parseFloat(vals[4])]);
     updateJVals(parseFloat(vals[0]), parseFloat(vals[1]), parseFloat(vals[2]), parseFloat(vals[3]), parseFloat(vals[4]), parseFloat(vals[5]));
     updateCVals(cart[0],cart[1],cart[2],cart[3],cart[4],cart[5]);
@@ -221,6 +251,12 @@ function sampHandler2(payload) {
             recordingData.ref[i].push(vals[i]);
         }
     }
+    spj1.innerHTML = vals[0]+'°';
+    spj2.innerHTML = vals[1]+'°';
+    spj3.innerHTML = vals[2]+'°';
+    spj4.innerHTML = vals[3]+'°';
+    spj5.innerHTML = vals[4]+'°';
+    spg.innerHTML = vals[5];
     if(graphtype.value == 'A')
     {
         if(gdlselect.value == 'J1')
@@ -359,6 +395,112 @@ function updateLineNumbers() {
 
 const textarea = document.getElementById('editor');
 textarea.addEventListener('input', updateLineNumbers);
+
+// Chama a função para definir as linhas ao carregar a página
+window.onload = function() {
+    updateLineNumbers();
+};
+
+//Atualização do slider de motion joint:
+const tabmotion = document.getElementById('tab-motion');
+const rj1 = document.getElementById('rj1');
+const rj2 = document.getElementById('rj2');
+const rj3 = document.getElementById('rj3');
+const rj4 = document.getElementById('rj4');
+const rj5 = document.getElementById('rj5');
+const rgg = document.getElementById('rgg');
+const j1jog = document.getElementById('j1jog');
+const j2jog = document.getElementById('j2jog');
+const j3jog = document.getElementById('j3jog');
+const j4jog = document.getElementById('j4jog');
+const j5jog = document.getElementById('j5jog');
+const gripjog = document.getElementById('gripjog');
+tabmotion.addEventListener('click', () => {
+    j1jog.value = current_dofs[0];
+    j2jog.value = current_dofs[1];
+    j3jog.value = current_dofs[2];
+    j4jog.value = current_dofs[3];
+    j5jog.value = current_dofs[4];
+    gripjog.value = current_dofs[5];
+    rj1.value = current_dofs[0];
+    rj2.value = current_dofs[1];
+    rj3.value = current_dofs[2];
+    rj4.value = current_dofs[3];
+    rj5.value = current_dofs[4];
+    rgg.value = current_dofs[5];
+});
+
+//Movimentações joint:
+j1jog.addEventListener('input', () => {
+    sendMqtt('request', 'G1'+','+j1jog.value.toString()+',');
+});
+j2jog.addEventListener('input', () => {
+    sendMqtt('request', 'G2'+','+j2jog.value.toString()+',');
+});
+j3jog.addEventListener('input', () => {
+    sendMqtt('request', 'G3'+','+j3jog.value.toString()+',');
+});
+j4jog.addEventListener('input', () => {
+    sendMqtt('request', 'G4'+','+j4jog.value.toString()+',');
+});
+j5jog.addEventListener('input', () => {
+    sendMqtt('request', 'G5'+','+j5jog.value.toString()+',');
+});
+gripjog.addEventListener('input', () => {
+    sendMqtt('request', 'G6'+','+gripjog.value.toString()+',');
+});
+
+//JOG linear BASE:
+const xub = document.getElementById('x+b');
+const xdb = document.getElementById('x-b');
+const yub = document.getElementById('y+b');
+const ydb = document.getElementById('y-b');
+const zub = document.getElementById('z+b');
+const zdb = document.getElementById('z-b');
+xub.addEventListener('click', () => {
+    sendMqtt('request', 'B10,0,0,');
+});
+xdb.addEventListener('click', () => {
+    sendMqtt('request', 'B-10,0,0,');
+});
+yub.addEventListener('click', () => {
+    sendMqtt('request', 'B0,10,0,');
+});
+ydb.addEventListener('click', () => {
+    sendMqtt('request', 'B0,-10,0,');
+});
+zub.addEventListener('click', () => {
+    sendMqtt('request', 'B0,0,10,');
+});
+zdb.addEventListener('click', () => {
+    sendMqtt('request', 'B0,0,-10,');
+});
+
+//JOG linear BASE:
+const xut = document.getElementById('x+t');
+const xdt = document.getElementById('x-t');
+const yut = document.getElementById('y+t');
+const ydt = document.getElementById('y-t');
+const zut = document.getElementById('z+t');
+const zdt = document.getElementById('z-t');
+xut.addEventListener('click', () => {
+    sendMqtt('request', 'T10,0,0,');
+});
+xdt.addEventListener('click', () => {
+    sendMqtt('request', 'T-10,0,0,');
+});
+yut.addEventListener('click', () => {
+    sendMqtt('request', 'T0,10,0,');
+});
+ydt.addEventListener('click', () => {
+    sendMqtt('request', 'T0,-10,0,');
+});
+zut.addEventListener('click', () => {
+    sendMqtt('request', 'T0,0,10,');
+});
+zdt.addEventListener('click', () => {
+    sendMqtt('request', 'T0,0,-10,');
+});
 
 // Chama a função para definir as linhas ao carregar a página
 window.onload = function() {
@@ -997,6 +1139,11 @@ const tg3 = document.getElementById('tg3');
 const tg4 = document.getElementById('tg4');
 const tg5 = document.getElementById('tg5');
 movetype.addEventListener('change', () => {
+    tg1.value = '';
+    tg2.value = '';
+    tg3.value = '';
+    tg4.value = '';
+    tg5.value = '';
     if(movetype.value == 'MJ')
     {
         tg1.style.display = 'flex';
@@ -1039,6 +1186,12 @@ movetype.addEventListener('change', () => {
     }
 });
 
+const spj1 = document.getElementById('spj1');
+const spj2 = document.getElementById('spj2');
+const spj3 = document.getElementById('spj3');
+const spj4 = document.getElementById('spj4');
+const spj5 = document.getElementById('spj5');
+const spg = document.getElementById('spg');
 
 const showj1 = document.getElementById('j1');
 const showj2 = document.getElementById('j2');
@@ -1224,7 +1377,18 @@ botup.addEventListener('click', () => {
     sendMqtt('request', 'C'+jointselect.value[1]+','+kpin.value.toString()+','+kiin.value.toString()+','+kdin.value.toString()+',');
 });
 
+jointselect.addEventListener('click', () => {
+    refval.value = '';
+    kpin.value = '';
+    kiin.value = '';
+    kdin.value = '';
+});
+
 looptype.addEventListener('change', () => {
+    refval.value = '';
+    kpin.value = '';
+    kiin.value = '';
+    kdin.value = '';
     if(looptype.value == 'O')
     {
         constantes.style.display = 'none';
@@ -1525,43 +1689,43 @@ function updateView() {
         chart1.data.datasets[0].label = 'x(t)';
         chart1.data.datasets[1].label = '';
         chart1.options.scales.y.title.text = 'X [mm]';
-        chart1.options.scales.y.min = chart1.options.scales.y.suggestedMin;
-        chart1.options.scales.y.max = chart1.options.scales.y.suggestedMax;
+        chart1.options.scales.y.min = -600;
+        chart1.options.scales.y.max = 600;
 
         chart2.options.plugins.title.text = 'Y Coordinate';
         chart2.data.datasets[0].label = 'y(t)';
         chart2.data.datasets[1].label = '';
         chart2.options.scales.y.title.text = 'Y [mm]';
-        chart2.options.scales.y.min = chart2.options.scales.y.suggestedMin;
-        chart2.options.scales.y.max = chart2.options.scales.y.suggestedMax;
+        chart2.options.scales.y.min = -600;
+        chart2.options.scales.y.max = 600;
 
         chart3.options.plugins.title.text = 'Z Coordinate';
         chart3.data.datasets[0].label = 'z(t)';
         chart3.data.datasets[1].label = '';
         chart3.options.scales.y.title.text = 'Z [mm]';
-        chart3.options.scales.y.min = chart3.options.scales.y.suggestedMin;
-        chart3.options.scales.y.max = chart3.options.scales.y.suggestedMax;
+        chart3.options.scales.y.min = -200;
+        chart3.options.scales.y.max = 800;
 
         chart4.options.plugins.title.text = 'A - Euler Angle';
         chart4.data.datasets[0].label = 'a(t)';
         chart4.data.datasets[1].label = '';
         chart4.options.scales.y.title.text = 'A [°]';
-        chart4.options.scales.y.min = chart4.options.scales.y.suggestedMin;
-        chart4.options.scales.y.max = chart4.options.scales.y.suggestedMax;
+        chart4.options.scales.y.min = -180;
+        chart4.options.scales.y.max = 180;
 
         chart5.options.plugins.title.text = 'E - Euler Angle';
         chart5.data.datasets[0].label = 'e(t)';
         chart5.data.datasets[1].label = '';
         chart5.options.scales.y.title.text = 'E [°]';
-        chart5.options.scales.y.min = chart5.options.scales.y.suggestedMin;
-        chart5.options.scales.y.max = chart5.options.scales.y.suggestedMax;
+        chart5.options.scales.y.min = -180;
+        chart5.options.scales.y.max = 180;
 
         chart6.options.plugins.title.text = 'R - Euler Angle';
         chart6.data.datasets[0].label = 'r(t)';
         chart6.data.datasets[1].label = '';
         chart6.options.scales.y.title.text = 'R [°]';
-        chart6.options.scales.y.min = chart6.options.scales.y.suggestedMin;
-        chart6.options.scales.y.max = chart6.options.scales.y.suggestedMax;
+        chart6.options.scales.y.min = -180;
+        chart6.options.scales.y.max = 180;
     }
     if(graphtype.value == 'F')
     {
@@ -1660,6 +1824,25 @@ botgo.addEventListener('click', () => {
     if(movetype.value == 'MJ')
     {
         sendMqtt('request', 'J'+tg1.value.toString()+','+tg2.value.toString()+','+tg3.value.toString()+','+tg4.value.toString()+','+tg5.value.toString()+',');
+        setStatus('Moving Joints...');
+    }
+    if(movetype.value == 'ML')
+    {
+        sendMqtt('request', 'L'+tg1.value.toString()+','+tg2.value.toString()+','+tg3.value.toString()+','+tg4.value.toString()+','+tg5.value.toString()+',');
+        setStatus('Moving Linear...');
+    }
+    if(movetype.value == 'MA')
+    {
+        if(framechoose.value == 'IB')
+        {
+            sendMqtt('request', 'B'+tg1.value.toString()+','+tg2.value.toString()+','+tg3.value.toString()+',');
+            setStatus('Moving About (in BASE)...');
+        }
+        if(framechoose.value == 'IT')
+        {
+            sendMqtt('request', 'T'+tg1.value.toString()+','+tg2.value.toString()+','+tg3.value.toString()+',');
+            setStatus('Moving About (in TOOL)...');
+        }
     }
 });
 
@@ -1668,5 +1851,5 @@ const bothome = document.getElementById('bothome');
 //Envio de target para movimentação:
 bothome.addEventListener('click', () => {
     startButton.click()
-    sendMqtt('request', 'J0,0,-5,0,0,');
+    sendMqtt('request', 'J0,-5,-5,0,0,');
 });
